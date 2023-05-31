@@ -1,0 +1,200 @@
+---
+title: "SMI205 Preregistration form" 
+author: '200382029'
+date: "2023-05-25"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 2
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
+  word_document:
+    toc: yes
+    toc_depth: '2'
+---
+
+```{r setup, include=FALSE}
+# By default, the code chunks are hidden. 
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r packages and data}
+# Load packages and data from the start
+```
+   
+<!-- 
+The text surrounded by these arrows is for your information and is hidden when the final document is knitted.
+-->
+
+# 1. My replication project 
+
+<!-- 
+Introduce the paper you have chosen for the replication project. Please add a  hyperlink in the doi number of the article. This is fine if you just copy this information from Assessment 1.
+-->
+
+**This is a preregistration of an extension project for the following study:**
+
+
+The paper chosen for the replication project aims to understand the impact of social media and its affect towards trust in the Government in 2012 and 2016 (considering the democratic party occupied the White House for both years). The paper uncovers how polarization politically compare for each party whilst controlling for other factors such as news consumption and demographic 
+
+
+
+**Down below is the reference paper and DOI:**
+
+***
+> [Klein, E., & Robison, J. (2020). Like, post, and distrust? How social media use affects trust in government. Political Communication, 37(1), 46-64.](https://www.tandfonline.com/doi/full/10.1080/10584609.2019.1661891)
+
+> doi number: https://doi.org/10.1080/10584609.2019.1661891
+
+***
+
+
+**In my replication project I am focusing on the following argument made in the study:**
+
+- Claim: "We expect a positive realtionship between this variable and our measure of distrust, i.e. increasingly favourable views toward the Republican Party realtive to the Democratic Party should be associated with increasing distrust given that a Democrat occupied the White House in both 2012 and 2016"  (page 6)
+
+- Summary Statistics representing this: 
+
+![The moderating role of stealth issue campaigns](pics/Picture1.png)
+
+
+# 2. Planned project extention
+
+## 2.1. Rationale for new hypothesis 
+
+<!--
+Present a new claim which you would like to test by extending the analysis of Claim X you decided to focus on in your replication project. Explain how your analysis extents the original study and, more broadly, how it contributes to the body of literature on the topic.
+Remember, make your counter-argument scientific by referring to evidence, like past research or other data. 
+-->
+
+Holt et al. describes the significance of social media affecting
+political interest based on age. The understanding of social media usage will depend
+widely on age which in turn can shape people's political interest. Whilst Holt
+et al does acknowledge motivations of social media vary between age, they can
+have a heavy impact and influence on societies political views. The data
+consisted of Swedish elections (similar to the ANES) and through OLS regression
+models found younger people shared less interest in politics than older people
+but found statistically significant results showing social media impacts all
+ages groups political interest.
+
+## 2.2. Prediction
+
+<!--
+Write your new argument in a form of a hypothesis. 
+Neatly summarise what results you are expecting to get and whether you expect them to be similar or different from the original study, and why.
+-->
+
+
+> Hypothesis: Based on Holt et al's findings, I will therefore look at how age can impact polarization between both political parties. I expect that the results will include somewhat similar conclusions however, including age as a seperate variable will give this paper a further developed understanding.This can be accomplished by taking age as a seperate vairable and squaring the vairable. From there a prediction model can be produced prepresenting the differences between age.
+Considering a Democrat occupied the White House in both years I expect that distrust in the government will increase as democrats get older but decrease as republicans get younger     
+
+
+# 3. Data
+
+<!--
+List all data sources you will use and describe whether the same data was used in the original study.
+If you constructed any new datasets on a basis of multiple secondary data, carefully describe the process and additional data sources.
+-->
+
+In this project I will be using the same data from the original paper (American National Election Studies) including data from the 2012 and 2016 studies
+
+
+- Data can be found on the Open Science Framework website [here](https://osf.io/gbav4/). As previously mentioned this includes data from covering two years. On the OFS website there was a cleaned version of necessary variables [here](https://osf.io/7qyur) which can be downloaded.
+
+# 4. Data analysis plan 
+
+## 4.1. Model specification
+
+<!--
+Explain what methods of data analysis you will use to answer your hypothesis. This is likely to be a regression model, so explain what kind of regression it is and why.
+Briefly explain how your model specification differs from the one used for Claim X.
+-->
+
+I will test the hypothesis using the same regression model applied in the study- OLS regression however, aim to encapsulate the differences in age effects between Democrats and Republicans. In the case there is an error with the coding to create two seperate graphs for parties, one single graph will be produced presenting age and social (dis)trust 
+
+## 4.2. Variables
+
+<!--
+Describe all variables that you will use in your data analysis. Explain how they were measured and whether they were manipulated in any way. 
+-->
+
+Dependent variable(s): 
+
+* Trust in Gov. (trust_index )
+
+Independent variables (IVs):
+
+* party attitudes
+* social media usage
+* news consumption 
+* financial condition
+* presidential approval 
+* age as a new separate variable (squared)
+* political preference  
+* stealth inclduing demographic variable
+ 
+As mentioned in the paper, the dependent variable consists of four items regarding trust on gov. which was then scaled from 0-1. 
+
+* A higher score means greater distrust
+* A lower score means less distrust 
+
+
+variables have been scaled from 0-1 
+
+## 4.3. Interference criteria
+
+<!--
+What criteria will you use to make inferences? These could be P-values, confidence intervals, and effect sizes.
+-->
+
+will take the standard acceptance of a p-value greater than 0.05 as being unacceptable and discarded apart from age and age^2 since it is a key variable used to understand the data
+
+
+## 4.4. Data exclusion
+
+<!-- 
+How will you determine what data or observations, if any, to exclude from your analyses? How will outliers be handled? Will you use any check to determine it?
+-->
+
+ Outliers will be included. No checks will be performed to determine eligibility for inclusion besides verification that each respondent answered questions 
+
+## 4.5. Missing data
+
+<!-- 
+How will you deal with incomplete or missing data?
+Remember that if the final analysis does not follow the specified plan, any deviations must be either strongly justified or included as a separate, exploratory analysis. 
+--> 
+
+If three of more of the questions are unanswered from the survey, they will be removed from the analysis and data that does not include anything for the dependent variable will be removed 
+
+
+## 4.6. Exploratory data anlysis
+
+<!-- 
+If you plan to explore your data to look for unexpected differences or relationships, please describe those tests here. 
+An exploratory test is any test where a prediction is not made up front, or there are multiple possible tests that you are going to use. A statistically significant finding in an exploratory test is a great way to form a new confirmatory hypothesis. 
+-->
+
+potentially looking for differences in polarization depending on party preference and age 
+
+Example: We expect that certain demographic traits may be related to attitudes to migration. Therefore, we will look for relationships between demographic variables (such as age, gender, income) and the attitudinal measures.
+
+
+
+# 5. Session info
+
+This preregistration form was completed in the following R environment:
+
+```{r session}
+sessionInfo()
+```
+
+# 6. References
+
+<!--
+Add a list of referenced sources here, so datasets and literature.
+-->
+
+[Holt, K., Shehata, A., Strömbäck, J. and Ljungberg, E., 2013. Age and the effects of news media attention and social media use on political interest and participation: Do social media function as leveller?. European journal of communication, 28(1), pp.19-34.](https://journals.sagepub.com/doi/pdf/10.1177/0267323112465369)
+ 
