@@ -1,0 +1,450 @@
+---
+title: "SMI205 Replication Project (2023)"
+author: "200382029"
+date: "29/05/2023"
+output: 
+  html_document:
+    theme: "yeti"
+    highlight: "monochrome"
+    code_download: true
+    toc: true
+    toc_depth: 2
+    toc_float: 
+      collapsed: false
+      smooth_scroll: true
+---
+
+```{r start, include=FALSE}
+# Opening key libraries first
+library(rmarkdown)
+library(knitr)
+```
+
+> Replication project on Government (dis)trust 
+ 
+
+##### Rpubs link: https://rpubs.com/a200382029/1047951
+##### GitHub Repository: https://github.com/200382029/smi205-assessment-2.git
+##### Study Preregistration form: https://rpubs.com/a200382029/1047701
+ 
+### Information about this replication project
+* Replication project based on:
+  + [Klein, E., & Robison, J. (2020). Like, post, and distrust? How social media use affects trust in government. Political Communication, 37(1), 46-64.](https://www.tandfonline.com/doi/full/10.1080/10584609.2019.1661891)
+* Replication method:
+  + Used materials obtained from authors
+
+***
+
+## Workspace setup {.tabset .tabset-pills}
+
+### YAML settings
+
+ output: </br>
+  &nbsp; html_document: </br>
+    &nbsp;&nbsp; code_download: true </br>
+    &nbsp;&nbsp;&nbsp; toc: true </br>
+    &nbsp;&nbsp;&nbsp; toc_depth: 2 </br>
+    &nbsp;&nbsp;&nbsp; toc_float: </br>
+      &nbsp;&nbsp;&nbsp;&nbsp; collapsed: false </br>
+      &nbsp;&nbsp;&nbsp;&nbsp; smooth_scroll: true </br>
+
+### Global settings of R chunks
+
+```{r setup, include=TRUE}
+# Global options
+opts_chunk$set(echo=TRUE,
+	             cache=TRUE,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE)
+```
+
+### Libraries 
+
+```{r libraries, include=TRUE}
+# All used libraries
+library("rmarkdown")
+library("knitr")
+library("haven")
+library("ggeffects")
+library("ggplot2")
+library("dplyr")
+library("ggthemes")
+library("gridExtra")
+library("cowplot")
+library("ggpubr")
+library("plotly")
+library("renv")
+library("sjPlot")
+library("prettydoc")
+library("withr")
+library("skimr")
+```
+
+### Versions of used packages
+
+```{r versions, echo=FALSE}
+# Versions of used packages
+packages <- c("rmarkdown", "knitr", "haven", "ggeffects", "ggplot2", "dplyr", "ggthemes", "gridExtra", "cowplot", "ggpubr", "plotly", "renv", "sjPlot", "prettydoc", "withr", "skimr")
+names(packages) <- packages
+lapply(packages, packageVersion)
+```
+
+### My enviroment
+
+```{r myR, echo=FALSE}
+# What is my R version?
+version[['version.string']]
+```
+
+##
+
+
+***
+  
+## 1. Introduction
+
+
+This research project is an extension to Klein and Robinson’s paper (2019) which examines how social media can (de)polarize society and influence our trust on the government. Within my project there is a shift to focus on age having an impact on trust and comparing democratic and republican voters. Whilst Klein and Robinson are partly effective in capturing how (dis)trust varies, Holt et al. (2013) would advocate for a focus on age, finding social media and political interest are heavily impacted by this. Through their study, Holt et al. finds that social media usage will vary according to age which indicates changes in political interest and trust. There is an acknowledgement that social media purposes will vary between age, it can be equally impactful and influence political views. The data comes from a similar variation to the ANES, a Swedish study and through an OLS regression model found younger people sharing less interest in politics than older people. Additionally, statistically significant results suggest social media interest can impact all age groups. I therefore find it necessary to analyse the impact of age (taking it as a separate variable to analyse) to understand trust differences towards trust of the government.
+
+Having analysed academic research surrounding age and governmental trust, age is found to be a statistically significant effect. Prior (2010) mentions the ease of access to political topics through social media, finding how political interest for one individual is unlikely to change drastically but with social media, people can invest a greater interest in politics. Furthermore, a paper conducted by Hitlin and Shutava (2022) focus on demographic factors influencing distrust in the government and particularly mention how impactful age can have: minor differences between those over sixty-five and people aged 18-34 for trust in government however, those middle aged had a far greater interest. Furthermore, Christensen and Lægreid in (2005) found older people tend to have a greater trust in the government but also notes the significance of institutions having a statistically significant impact on trust. Whilst these papers all find age to have an impact towards trust they all consist of alternative views, therefore should analysed to a greater context.
+Alternatively, Dalton assess the ANES, to cover political interest but focuses on how views differ over decades. This gives an alternative perspective, rather than analysing age Dalton concentrates the focus through a longitudinal approach from 1952 to 2000 gathering opinions from over twelve elections. The study included information such as 1980 being the lowest point (during the Reagan administration) and the 1960’s consisted of the era with most trust. There is an overall downwards trend over these years and Dalton does reflect the impact of social media and a reasoning behind a decrease in political trust.
+
+In the preregistration form it was clarified how equivalent results were expected to Klein and Robinson (2019) but with age being the main shift of focus, I expected that distrust in government for democrats will increase with age whereas a decrease for republicans. (This prediction was since a democrat occupying the White House in both years the study was conducted). The type of replication would be described as "tests of robustness" (Freese and Perterson, 2017) where the same data was analysed however, a slight variation in what was being researched.   
+
+***
+
+## 2. Data and methods
+
+> 2.1. Data
+
+
+The data is analysed from the American National Election Studies (ANES) which is identical to the original paper and can be found on the OFS Home website. The ‘anes_comb.dta’ variable was chosen since all required variables were accessible.
+
+#### Downloading dataset
+```{r}
+anes_comb <- read_dta("C:/Users/44748/Downloads/anes_comb.dta")
+```
+
+The dataset contained 10,184 observations with eighty-nine separate variables and gathered data in 2012 and 2016. The dependent variable analysed is the ‘Trust Index’ which consists of four different questions regarding trust of the government then scaled 0-1, a higher result meaning greater distrust in government and lower meaning greater trust in government. 
+
+#### Trust index examples 
+```{r echo=FALSE}
+head(anes_comb$trust_index)
+```
+
+The paper had results regarding ‘party attitudes’ similarly ranked 0-1 with a low score associated with democratic and high with a republican preference. To understand which political party the subjects favoured, a ‘Party’ variable was formed which separated the two into “demo” and “rep” favoured voters (anything greater than 0.5 was coded as ‘rep’ and less than as ‘demo’). 
+
+#### Separating out the two parties 
+```{r}
+anes_comb$party[anes_comb$pol_party01 > 0.504] <- "rep"
+anes_comb$party[anes_comb$pol_party01 < 0.496] <- "demo"
+```
+
+
+Furthermore, to understand party differences, two additional datasets including party preference was created. From there two alternative regression models could be created to understand differences.
+
+#### Creating two different datasets based on party
+```{r}
+anes_dem <- anes_comb %>% filter(party == "demo")
+anes_rep <- anes_comb %>% filter(party == "rep")
+```
+
+
+Other than this, there were no other variable changes. For those (4 respondents) within the midpoint (0.5) with no party preference being ignored.
+Rather than using the whole dataset as one, the two political parties’ datasets were used to replicate ‘Figure 1’ with all original variables included with the addition of age (taken as a separate variable) and age squared (age^2). Other variables in this research include social media use; presidential approval; social trust; gender; race and income. STEALTH was another important variable in understanding diverse opinions differing with age and between democrats and republicans.
+
+
+### Brief summary statistics including trust and age {.tabset .tabset-pills}
+
+#### Overall
+```{r echo=FALSE}
+skim(anes_comb, trust_index, age)
+```
+
+#### Democratic
+```{r echo=FALSE}
+skim(anes_dem, trust_index, age)
+```
+
+#### Republican
+```{r echo=FALSE}
+skim(anes_rep, trust_index, age)
+```
+
+###
+
+> 2.2. Methods
+
+In the paper linear regression was conducted to understand government trust and party attitudes, this was the same method used in this research. The method from this research was similar, taking all identical variables but also including age as a factor. Furthermore, this research also included two separate datasets reflecting their party preference to understand differences. So, a total of three statistical models are presented, showing an overall trend and two representing differences between each political party.
+
+### Regression Codes (3) {.tabset .tabset-pills}
+
+#### Overall
+```{r}
+# graph 1
+graph1 <- lm(data = anes_comb, trust_index ~ as.numeric(pol_party01) +
+               as.numeric(socialmed01) + mediause01 +
+               news_cons01 + worse_off01 + pres_aprv + libcon01 + as.factor(gay_mar) +
+               spend_index01 + social_trust01 + activity_trunc +
+               as.factor(male) + educ01 + as.factor(race_cat_1) +
+               s_issue + party + age + I(age^2))
+
+# graph 2 (FINAL)
+graph2 <- lm(data = anes_comb, trust_index ~ +
+               mediause01 + news_cons01 + worse_off01 +
+               pres_aprv +spend_index01 + social_trust01 +
+               educ01 + s_issue + party + age + I(age^2))
+```
+
+
+#### Democratic
+```{r}
+# graph 1
+graph1d <- lm(data = anes_dem, trust_index ~ as.numeric(pol_party01) +
+               as.numeric(socialmed01) + mediause01 +
+               news_cons01 + worse_off01 + pres_aprv + libcon01 + as.factor(gay_mar) +
+               spend_index01 + social_trust01 + activity_trunc +
+               as.factor(male) + educ01 + as.factor(race_cat_1) +
+               s_issue + age + I(age^2))
+
+# graph 2
+graph2d <- lm(data = anes_dem, trust_index ~ +
+                mediause01 +
+                news_cons01 + worse_off01 + pres_aprv + as.factor(gay_mar) +
+                spend_index01 + social_trust01 +
+                educ01 + as.factor(race_cat_1) +
+                s_issue + age + I(age^2))
+
+# graph 3
+graph3d <- lm(data = anes_dem, trust_index ~ +
+                mediause01 +
+                worse_off01 + pres_aprv +
+                social_trust01 +
+                educ01 + as.factor(race_cat_1) +
+                s_issue + age + I(age^2))
+
+# graph 4 (FINAL)
+graph4d <- lm(data = anes_dem, trust_index ~ +
+                 +worse_off01 + pres_aprv +
+                social_trust01 +s_issue + age + I(age^2))
+
+
+```
+
+#### Republican
+```{r}
+# graph 1
+graph1r <- lm(data = anes_rep, trust_index ~ as.numeric(pol_party01) +
+               as.numeric(socialmed01) + mediause01 +
+               news_cons01 + worse_off01 + pres_aprv + libcon01 + as.factor(gay_mar) +
+               spend_index01 + social_trust01 + activity_trunc +
+               as.factor(male) + educ01 + as.factor(race_cat_1) +
+               s_issue + age + I(age^2))
+
+# graph 2
+graph2r <- lm(data = anes_rep, trust_index ~ +
+                mediause01 +
+                news_cons01 + worse_off01 + pres_aprv + as.factor(gay_mar) +
+                spend_index01 + social_trust01 +
+                educ01 + as.factor(race_cat_1) +
+                s_issue + age + I(age^2))
+
+# graph 3
+graph3r <- lm(data = anes_rep, trust_index ~ +
+                news_cons01 + worse_off01 + pres_aprv+
+                spend_index01 + social_trust01 +
+                educ01 + as.factor(race_cat_1) +
+                s_issue + age + I(age^2))
+
+# graph 4 (FINAL)
+graph4r <- lm(data = anes_rep, trust_index ~ +
+                 + worse_off01 + pres_aprv+
+                 + social_trust01 +
+                 +s_issue + age + I(age^2))
+```
+
+###
+
+When running the regression code, both codes began with all identical variables included in the original paper along with age (taken as its own variable) and age squared. After applying the ‘summary’ feature for both modes, one-by-one statistically insignificant results were removed (p-value > 0.05) from the regression. For this research, I aimed to have the identical variables for the ‘demo’ and ‘rep’ regression model so both models would be easily comparable with no differing variables. Once the three models contain statically significant results, prediction models can be formed representing changes in political trust whilst controlling for age, hence adding a polynomial in age squared. With these prediction modes, comparisons between the party can be made to understand how (dis)trust varies over age.
+In addition, linear regression graphics are displayed with trust and age without controlling for other variables and are included to produce a simple understanding in comparison between political parties and the (dis)trust. Geom_smooth is used to visualise the confidence intervals whilst predicting for ‘age’.
+
+***
+
+## 3. Results 
+
+
+### Trust as people get older {.tabset .tabset-pills}
+
+#### Overall
+```{r}
+combi <- anes_comb %>% 
+     na.omit() %>% 
+     ggplot()+
+     aes(x = age, y = trust_index, colour = party)+
+     stat_smooth(method = 'loess')+
+  scale_color_manual(labels = c("Democratic", "Republican"),
+                     values = c('Blue', 'Red'))+
+  labs(title = "Distrust in government as people get older",
+       x = "Age", y = "Trust in Government",
+       caption = "DATA: OSF Home")+
+  theme_solarized()
+ggplotly(combi)
+```
+
+#### Democratic 
+```{r}
+demt <- ggplot(data = graph4d, aes(x = age, y = trust_index))+
+  stat_smooth(method = 'loess')+
+  labs(title = "Distrust in governmnet as people get older",
+       subtitle = "(Democratic)", x = "Age", y = "Trust in Government",
+       caption = "DATA: OSF Home")+
+  theme_solarized()+
+  scale_color_manual(values = 'Blue')
+ggplotly(demt)
+
+```
+
+
+#### Republican
+```{r}
+rept <- ggplot(data = graph4r, aes(x = age, y = trust_index))+
+  stat_smooth(method = 'loess', colour = "Red")+ 
+  labs(title = "Distrust in governmnet as people get older",
+       subtitle = "(Republican)", x = "Age", y = "Trust in Government",
+       caption = "DATA: OSF Home")+
+  theme_solarized()+ 
+  scale_color_manual(values = c('Red')) 
+ggplotly(rept)
+```
+
+
+The first three sets of graphics show predictions for the linear models (confidence level at 95%) and used to enhance the readers knowledge regarding the distrust (of gov.) and how it varies over age. The ‘overall’ graph represents the differences in distrust with parties, where republicans overall a positive relationship with distrust and age increase. On the other hand, democratic differs with a small negative association. As people get older the range between the two expands and bipolar results around the ages of 55 are evident with republicans having an increase in distrust and democrats having a decrease (until the very later ages).  The singular party models have also been included to provide a ’simpler’ model to understand and interact with.
+
+
+
+
+
+### Overall results
+```{r}
+tab_model(graph2,
+          pred.labels = c("(Intercept)", "Media usage",
+                          "News usage", "Worse off", "Approval",
+                          "Spend Index", "Social trust",
+                          "Education", "Stealth", "Party", "Age",
+                          "Age^2"),
+          dv.labels = c("Overall Distrust"))
+```
+
+
+When creating the regression model of overall distrust, the statistically significant results are highlighted in bold under ‘p’. Media (0.03) and news (0.02) usage are both associated with positive coefficient estimates in distrust, suggesting both these factors have a significance on our interpretation around government and even daily life, with media having a slightly greater impact than news. Those who agree with approval of the president has the greatest decline in estimates        (-0.17), makes perfect sense since they agree with the current president. Those who believed they were worse off therefore saw the direct opposite with a 0.06 increase in distrust. Spending index      (-0.04) and education (-0.03) both also saw negative coefficient estimates suggesting as both increases, the levels of trust increase. Finally, those with increasing social trust (0.08) had an overall distrust in government. Although stealth and party are not statistically significant, they have remained in the model since they are important factors which are analysed later. As mentioned in the pre-registration form earlier, age and age^2 remain regardless since it is the variable we are measuring. 
+
+
+### Comparing both results
+```{r}
+tab_model(graph4d, graph4r, 
+          pred.labels = c("Intercept", "Worse Off", "Approval",
+          "Distrust", "Stealth", "Age", "Age^2"),
+          dv.labels = c("Democratic", "Republican"),
+          string.est = "Coeff",
+          string.ci = "Conf. Int (95%)",
+          string.p = "P-value")
+```
+
+
+Once the two linear regressions are separated, given variables can be compared and understood for each party. For example, democrats believing they were worse off have a greater distrust than republicans. With those who had of approval for the president, republicans had a much larger coefficient estimate of trust. It is also shown there is a greater level of distrust amongst republicans than democrats which suggests they had a greater sense of mistrust over the two elections (with each party winning once). 
+
+### 'Age' Controlled GRAPHS (DEMO AND REP)
+```{r message=FALSE, include=FALSE, results='hide'}
+predR <- ggpredict(graph4r, terms = c("age"))
+predD <- ggpredict(graph4d, terms = c("age"))
+
+controlR <- plot(predR)
+controlD <- plot(predD)
+
+DCON <- controlD + labs(x = "Age", y = "(Democratic)",
+                title = "Democratic" +
+  theme_pander()+
+  xlim(20, 90))  
+
+RCON <- controlR + labs(x = "", y = "(Republican)",
+               title = "Republican" +
+  theme_pander()+
+  xlim(20, 90))
+```
+
+```{r include=FALSE}
+control <- grid.arrange(RCON, DCON)
+```
+
+```{r}
+annotate_figure(control,
+                top = text_grob("Distrust in Government", size = 16, face = "bold"),
+                bottom = text_grob("Data source: OFS Home",
+                                   hjust = 1, x = 1, face = "italic", size = 10),
+                left = text_grob("Distrust in Government", rot = 90, size = 16))
+```
+
+
+Next, both these graphics represent age compared with level of distrust whilst controlling for all other variables. Both graphs are similar with an overall decrease in trust with democratic having a much larger decrease. Republicans have a peak level of distrust (0.769) around the age of 50 whereas democrats peak level of distrust (0.65) arrives around the age 44. As both parties get older, there ends up being an increase in trust, a much greater increase for democrats (0.037) than republicans (0.023). It is important to notice the confidence intervals larger since the quantity of older voters decrease. 
+
+
+
+
+### Understanding 'Stealth issues'
+```{r}
+ggplot(data = graph2, aes(x = age, y = trust_index, colour = party))+
+  stat_smooth(method = 'loess')+
+  facet_wrap(~s_issue, dir = "h")+
+  theme_igray()+   
+  labs(x = "Age" , y = "Trust", 
+       title = "Distrust in Government by age",
+       subtitle = "STEALTH Campaign: 0 = low diverse opinion, 5 = highly diverse opinion",
+       caption = "DATA: OSF Home")+
+  scale_color_manual(labels = c("Democratic", "Republican"),
+    values = c('Blue', 'Red'))
+```
+
+
+Finally, we can enhance our understanding from the original study by assessing levels of trust varying as parties have a greater level of diverse opinions. The graphic shows republicans almost always having a greater level of distrust however, as opinions get more diverse, the difference in distrust decreases. The levels of distrust do not decrease much for democrats however, as diversity increases for democrats, so does their level in trust.
+
+***
+
+## 4. Conclusions
+ 
+
+To conclude with, we can see how social media had an effect on trust within parties something advocated by Holt et al along with Prior but also furthered the study by looking at how it varied between parties. When assessing this project with the original study, it does differ in the way they find an overall difference between parties and trust whereas this project finds a similar patter with distrust being highest during middle ages and lowest at young and old ages.
+
+Likewise, results from this project favours Christensen and Lægreid's research finding how trust increases as people get older (my research finds this occurs with both parties). Dalton's perspective through a longitudinal approach is something that could have been further researched and understanding trust patterns throughout decades however, we both come to the conclusion that social media has a powerful impact on individuals. Hitlin and Shutava's study is something  that is somewhat challenged, the levels of trust between older and younger people were minimal (as found in their study) however, we find the opposite in trust for middle aged people where there is an increase in distrust rather than trust.
+
+As to the hypothesis stated earlier, it was marginally correct in stating distrust will increase with democrats however, in this study did find an increase at the 'older' ages. The hypothesis also suggested the opposite for republicans, however the same trend occurs as democrats (although this does occur at a lower rate for all ages). The Stealth graphs was faceted in the final graphs to get a visualisation of how trust patterns may differ upon diverse opinions (such as abortion and gun rights) and was successful in finding a difference between both parties.
+
+ 
+
+
+## References
+
+
+* [Christensen, T. and Lægreid](https://www.tandfonline.com/doi/abs/10.1080/15309576.2005.11051848), P., 2005. Trust in government: The relative importance of service satisfaction, political factors, and demography. Public performance & management review, 28(4), pp.487-511.
+* [Dalton, R.J.](https://www.tandfonline.com/doi/full/10.1080/03906700500038819), 2005. The social transformation of trust in government. International review of sociology, 15(1), pp.133-154.
+* [Freese, J. and Peterson, D.](https://www.annualreviews.org/doi/pdf/10.1146/annurev-soc-060116-053450), 2017. Replication in social science. Annual Review of Sociology, 43, pp.147-165.
+* [HITLIN, P. and SHUTAVA, N.](https://ourpublicservice.org/wp-content/uploads/2022/03/Trust-in-Government.pdf), 2022. Trust in government.
+* [Holt, K., Shehata, A., Strömbäck, J. and Ljungberg, E.](https://journals.sagepub.com/doi/pdf/10.1177/0267323112465369), 2013. Age and the effects of news media attention and social media use on political interest and participation: Do social media function as leveller?. European journal of communication, 28(1), pp.19-34.
+* [Klein, E., & Robison, J.](https://www.tandfonline.com/doi/full/10.1080/10584609.2019.1661891) (2020). Like, post, and distrust? How social media use affects trust in government. Political Communication, 37(1), 46-64.
+* [Prior, M., 2010.](https://www.journals.uchicago.edu/doi/full/10.1017/S0022381610000149) You’ve either got it or you don’t? The stability of political interest over the life cycle. The Journal of Politics, 72(3), pp.747-766.
+
+
+
+## Appendix
+
+### Appendix 1. My enviroment (full information) 
+
+```{r session}
+# Detailed information about my environment
+sessionInfo()
+```
+
+### Appendix 2. Entire R code used in the project
+
+```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
+```
